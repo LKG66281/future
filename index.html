@@ -26,6 +26,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      flex-direction: column;
     }
     .container {
       background: rgba(255, 255, 255, 0.05);
@@ -48,6 +49,7 @@
       border-radius: 8px;
       background: rgba(255,255,255,0.1);
       color: white;
+      font-size: 16px;
     }
     input::placeholder {
       color: #ccc;
@@ -60,15 +62,45 @@
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s ease, background 0.3s ease;
     }
     button:hover {
       transform: scale(1.05);
       background: #7e5eff;
     }
+    /* Custom Message Box */
+    .message-box {
+      display: none;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 8px;
+      color: white;
+      text-align: center;
+      font-size: 16px;
+      width: 80%;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+    .success {
+      background: #00ff00;
+      animation: neonGreen 1.5s ease-in-out infinite alternate;
+    }
+    .error {
+      background: #ff3366;
+      animation: neonRed 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes neonGreen {
+      0% { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #00ff00; }
+      100% { text-shadow: 0 0 10px #00ff00, 0 0 15px #00ff00, 0 0 30px #00ff00; }
+    }
+    @keyframes neonRed {
+      0% { text-shadow: 0 0 5px #ff3366, 0 0 10px #ff3366, 0 0 20px #ff3366; }
+      100% { text-shadow: 0 0 10px #ff3366, 0 0 15px #ff3366, 0 0 30px #ff3366; }
+    }
   </style>
 </head>
 <body>
+
   <div class="container">
     <h2>🚀 Futuristic Login</h2>
     <input type="email" id="email" placeholder="Email">
@@ -78,6 +110,8 @@
       <button onclick="signup()">Sign Up</button>
     </div>
   </div>
+
+  <div class="message-box" id="messageBox"></div>
 
   <script>
     // Firebase Configuration
@@ -95,13 +129,22 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // Show custom message
+    function showMessage(message, type) {
+      const messageBox = document.getElementById("messageBox");
+      messageBox.textContent = message;
+      messageBox.className = 'message-box ' + type;  // Add 'success' or 'error'
+      messageBox.style.display = 'block';
+      setTimeout(() => { messageBox.style.display = 'none'; }, 4000);
+    }
+
     // Login function
     function login() {
       const email = document.getElementById("email").value;
       const pass = document.getElementById("password").value;
       auth.signInWithEmailAndPassword(email, pass)
-        .then(() => alert("✅ Logged in!"))
-        .catch(e => alert("❌ " + e.message));
+        .then(() => showMessage("✅ Successfully logged in!", "success"))
+        .catch(e => showMessage("❌ " + e.message, "error"));
     }
 
     // Signup function (with Firestore storage)
@@ -121,12 +164,189 @@
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           })
           .then(() => {
-            alert("🎉 Account created and user profile saved!");
+            showMessage("🎉 Account created successfully!", "success");
           })
-          .catch(e => alert("❌ " + e.message));
+          .catch(e => showMessage("❌ " + e.message, "error"));
         })
-        .catch(e => alert("❌ " + e.message));
+        .catch(e => showMessage("❌ " + e.message, "error"));
     }
   </script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Futuristic Login</title>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <!-- Fonts + Style -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Orbitron', sans-serif;
+    }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2rem;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px #6e4aff;
+      text-align: center;
+      width: 300px;
+    }
+    .container h2 {
+      margin-bottom: 1rem;
+      color: #b794f4;
+    }
+    input {
+      width: 100%;
+      margin: 10px 0;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 16px;
+    }
+    input::placeholder {
+      color: #ccc;
+    }
+    button {
+      padding: 0.8rem 2rem;
+      margin: 5px;
+      background: #6e4aff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+      background: #7e5eff;
+    }
+    /* Custom Message Box */
+    .message-box {
+      display: none;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 8px;
+      color: white;
+      text-align: center;
+      font-size: 16px;
+      width: 80%;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+    .success {
+      background: #00ff00;
+      animation: neonGreen 1.5s ease-in-out infinite alternate;
+    }
+    .error {
+      background: #ff3366;
+      animation: neonRed 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes neonGreen {
+      0% { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #00ff00; }
+      100% { text-shadow: 0 0 10px #00ff00, 0 0 15px #00ff00, 0 0 30px #00ff00; }
+    }
+    @keyframes neonRed {
+      0% { text-shadow: 0 0 5px #ff3366, 0 0 10px #ff3366, 0 0 20px #ff3366; }
+      100% { text-shadow: 0 0 10px #ff3366, 0 0 15px #ff3366, 0 0 30px #ff3366; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🚀 Futuristic Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <div>
+      <button onclick="login()">Login</button>
+      <button onclick="signup()">Sign Up</button>
+    </div>
+  </div>
+
+  <div class="message-box" id="messageBox"></div>
+
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxUwcTWRApLE7F_LHMXHOrmoQVWabfpgA",
+      authDomain: "future-4a5bb.firebaseapp.com",
+      projectId: "future-4a5bb",
+      storageBucket: "future-4a5bb.firebasestorage.app",
+      messagingSenderId: "769026893150",
+      appId: "1:769026893150:web:a45882a2d5336b58d09bcf",
+      measurementId: "G-C13FSB81CT"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Show custom message
+    function showMessage(message, type) {
+      const messageBox = document.getElementById("messageBox");
+      messageBox.textContent = message;
+      messageBox.className = 'message-box ' + type;  // Add 'success' or 'error'
+      messageBox.style.display = 'block';
+      setTimeout(() => { messageBox.style.display = 'none'; }, 4000);
+    }
+
+    // Login function
+    function login() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(() => showMessage("✅ Successfully logged in!", "success"))
+        .catch(e => showMessage("❌ " + e.message, "error"));
+    }
+
+    // Signup function (with Firestore storage)
+    function signup() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      const username = prompt("Enter your username");
+
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          // Store user data in Firestore
+          db.collection("users").doc(user.uid).set({
+            username: username,
+            email: email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          })
+          .then(() => {
+            showMessage("🎉 Account created successfully!", "success");
+          })
+          .catch(e => showMessage("❌ " + e.message, "error"));
+        })
+        .catch(e => showMessage("❌ " + e.message, "error"));
+    }
+  </script>
+
 </body>
 </html>
