@@ -8,6 +8,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
   <!-- Fonts + Style -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
@@ -79,6 +80,7 @@
   </div>
 
   <script>
+    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCxUwcTWRApLE7F_LHMXHOrmoQVWabfpgA",
       authDomain: "future-4a5bb.firebaseapp.com",
@@ -91,7 +93,9 @@
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
+    // Login function
     function login() {
       const email = document.getElementById("email").value;
       const pass = document.getElementById("password").value;
@@ -100,11 +104,27 @@
         .catch(e => alert("❌ " + e.message));
     }
 
+    // Signup function (with Firestore storage)
     function signup() {
       const email = document.getElementById("email").value;
       const pass = document.getElementById("password").value;
+      const username = prompt("Enter your username");
+
       auth.createUserWithEmailAndPassword(email, pass)
-        .then(() => alert("🎉 Account created!"))
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          // Store user data in Firestore
+          db.collection("users").doc(user.uid).set({
+            username: username,
+            email: email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          })
+          .then(() => {
+            alert("🎉 Account created and user profile saved!");
+          })
+          .catch(e => alert("❌ " + e.message));
+        })
         .catch(e => alert("❌ " + e.message));
     }
   </script>
